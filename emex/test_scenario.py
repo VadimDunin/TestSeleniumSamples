@@ -70,7 +70,6 @@ class Application:
         self.wd.get(self.home_page_url)
 
 
-
 @pytest.fixture()
 def app(request):
     fixture = Application()
@@ -82,10 +81,28 @@ def app(request):
     return fixture
 
 
-#app = Application()
-
 
 def test_open_home_page(app):
+    app.home_page.open_page()
+    app.home_page.login(login=Vadim.mail, password=Vadim.password)
+    time.sleep(timeout)
+    assert app.home_page.check_user_session(Vadim.displayed_username)
+    app.home_page.logout()
+    time.sleep(timeout)
+    app.wd.quit()
+
+
+def test_login(app):
+    app.home_page.open_page()
+    app.home_page.login(login=Vadim.mail, password=Vadim.password)
+    time.sleep(timeout)
+    assert app.home_page.check_user_session(Vadim.displayed_username)
+    app.home_page.logout()
+    time.sleep(timeout)
+    app.wd.quit()
+
+
+def test_logout(app):
     app.home_page.open_page()
     app.home_page.login(login=Vadim.mail, password=Vadim.password)
     time.sleep(timeout)
