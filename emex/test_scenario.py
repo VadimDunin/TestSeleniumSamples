@@ -15,6 +15,7 @@ class User:
 
 
 Vadim = User('Вадим', 'Xxbzzczxxax2020', 'duninv@gmail.com')
+timeout = 3
 
 
 def test_open_home_page():
@@ -28,12 +29,12 @@ def test_open_home_page():
     password_field.send_keys(Vadim.password)
     button_enter = wd.find_element_by_css_selector('button.Button__ButtonItem-sc-1lg7vvv-2.hBBlZe.SignIn__LogInButton-sc-14u62jc-9.bjXHrz')
     button_enter.click()
-    time.sleep(5)
+    time.sleep(timeout)
     login_name = wd.find_element_by_css_selector("span.UserControls__UserName-sc-1lqz9cn-4.bcScNr").text
     assert str(login_name).strip(" ") == Vadim.displayed_username
     user_menu = wd.find_element_by_css_selector('div.Button__Content-sc-1lg7vvv-0.erUssK > span')
     user_menu.click()
     button_users_menu_quit = wd.find_element_by_css_selector('button.Button__ButtonItem-sc-1lg7vvv-2.lgbJSW.UserMenu__ExitButton-sc-12qog7b-0.cuaza-d')
     button_users_menu_quit.click()
-    time.sleep(4)
+    time.sleep(timeout)
     wd.quit()
