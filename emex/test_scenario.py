@@ -2,7 +2,7 @@ from selenium.webdriver.chrome.webdriver import WebDriver
 import pytest, time
 
 
-url = ""
+url = "https://emex.ru"
 
 
 class User:
@@ -14,7 +14,7 @@ class User:
 
 Vadim = User('Вадим', 'Xxbzzczxxax2020', 'duninv@gmail.com')
 User1 = User('Ivan', '1qaz@WSX', 'sharpshooter47@yanadex.ru')
-timeout = 5
+timeout = 10
 
 
 class HomePageLocators:
@@ -28,33 +28,33 @@ class HomePageLocators:
 
 
 class Application:
-    def __init__(self):
+    def __init__(self, home_page_url):
         self.wd = WebDriver(executable_path="C:\Temp\ChromeDriver\83.exe")
         self.wd.implicitly_wait(5)
+        self.home_page_url = home_page_url
 
     def quit(self):
         self.wd.quit()
 
     def open_home_page(self, full_screen_browser=True):
-        self.wd.get("https://emex.ru")
+        self.wd.get(self.home_page_url)
         if full_screen_browser:
             self.wd.maximize_window()
 
+    def login(self, login, password):
+        self.wd.find_element_by_css_selector(HomePageLocators.login_button).click()
+        self.wd.find_element_by_name(HomePageLocators.login_field).send_keys(login)
+        self.wd.find_element_by_name(HomePageLocators.password_field).send_keys(password)
+        self.wd.find_element_by_css_selector(HomePageLocators.enter_button).click()
 
-app = Application()
+
+app = Application(url)
 
 
 def test_open_home_page():
     wd = app.wd
     app.open_home_page()
-    button_login = wd.find_element_by_css_selector(HomePageLocators.login_button)
-    button_login.click()
-    login_field = wd.find_element_by_name(HomePageLocators.login_field)
-    password_field = wd.find_element_by_name(HomePageLocators.password_field)
-    login_field.send_keys(Vadim.mail)
-    password_field.send_keys(Vadim.password)
-    button_enter = wd.find_element_by_css_selector(HomePageLocators.enter_button)
-    button_enter.click()
+    app.login(login=Vadim.mail, password=Vadim.password)
     time.sleep(timeout)
     login_name = wd.find_element_by_css_selector(HomePageLocators.login_name_text).text
     assert str(login_name).strip(" ") == Vadim.displayed_username
