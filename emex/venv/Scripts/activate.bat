@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set "VIRTUAL_ENV=C:\Users\Vadim\PycharmProjects\emex\venv"
+set "VIRTUAL_ENV=E:\Vadim\Develop\TestSeleniumSamples\emex\venv"
 
 if not defined PROMPT (
     set "PROMPT=$P$G"
