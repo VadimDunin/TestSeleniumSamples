@@ -2,8 +2,6 @@ from selenium.webdriver.chrome.webdriver import WebDriver
 import pytest, time
 
 
-wd = WebDriver(executable_path="C:\Temp\ChromeDriver\83.exe")
-wd.implicitly_wait(5)
 url = ""
 
 
@@ -16,7 +14,7 @@ class User:
 
 Vadim = User('Вадим', 'Xxbzzczxxax2020', 'duninv@gmail.com')
 User1 = User('Ivan', '1qaz@WSX', 'sharpshooter47@yanadex.ru')
-timeout = 3
+timeout = 5
 
 
 class HomePageLocators:
@@ -29,9 +27,26 @@ class HomePageLocators:
     users_menu_quit_buttton = 'button.Button__ButtonItem-sc-1lg7vvv-2.lgbJSW.UserMenu__ExitButton-sc-12qog7b-0.cuaza-d'
 
 
+class Application:
+    def __init__(self):
+        self.wd = WebDriver(executable_path="C:\Temp\ChromeDriver\83.exe")
+        self.wd.implicitly_wait(5)
+
+    def quit(self):
+        self.wd.quit()
+
+    def open_home_page(self, full_screen_browser=True):
+        self.wd.get("https://emex.ru")
+        if full_screen_browser:
+            self.wd.maximize_window()
+
+
+app = Application()
+
+
 def test_open_home_page():
-    wd.get("https://emex.ru")
-    wd.maximize_window()
+    wd = app.wd
+    app.open_home_page()
     button_login = wd.find_element_by_css_selector(HomePageLocators.login_button)
     button_login.click()
     login_field = wd.find_element_by_name(HomePageLocators.login_field)
@@ -48,4 +63,4 @@ def test_open_home_page():
     button_users_menu_quit = wd.find_element_by_css_selector(HomePageLocators.users_menu_quit_buttton)
     button_users_menu_quit.click()
     time.sleep(timeout)
-    wd.quit()
+    app.wd.quit()
