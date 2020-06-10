@@ -27,16 +27,12 @@ class HomePageLocators:
     users_menu_quit_buttton = 'button.Button__ButtonItem-sc-1lg7vvv-2.lgbJSW.UserMenu__ExitButton-sc-12qog7b-0.cuaza-d'
 
 
-class Application:
-    def __init__(self, home_page_url):
-        self.wd = WebDriver(executable_path="C:\Temp\ChromeDriver\83.exe")
-        self.wd.implicitly_wait(5)
-        self.home_page_url = home_page_url
+class HomePage:
+    def __init__(self, wd):
+        self.wd = wd
+        self.home_page_url = "https://emex.ru"
 
-    def quit(self):
-        self.wd.quit()
-
-    def open_home_page(self, full_screen_browser=True):
+    def open_page(self, full_screen_browser=True):
         self.wd.get(self.home_page_url)
         if full_screen_browser:
             self.wd.maximize_window()
@@ -47,20 +43,53 @@ class Application:
         self.wd.find_element_by_name(HomePageLocators.password_field).send_keys(password)
         self.wd.find_element_by_css_selector(HomePageLocators.enter_button).click()
 
+    def logout(self):
+        self.wd.find_element_by_css_selector(HomePageLocators.users_menu).click()
+        self.wd.find_element_by_css_selector(HomePageLocators.users_menu_quit_buttton).click()
 
-app = Application(url)
+    def check_user_session(self, username):
+        login_name = self.wd.find_element_by_css_selector(HomePageLocators.login_name_text).text
+        if str(login_name).strip(" ") == username:
+            res = True
+        else:
+            res = False
+        return res
 
 
-def test_open_home_page():
-    wd = app.wd
-    app.open_home_page()
-    app.login(login=Vadim.mail, password=Vadim.password)
+class Application:
+    def __init__(self):
+        self.wd = WebDriver(executable_path="C:\Temp\ChromeDriver\83.exe")
+        self.wd.implicitly_wait(5)
+        self.home_page_url = "https://emex.ru"
+        self.home_page = HomePage(self.wd)
+
+    def quit(self):
+        self.wd.quit()
+
+    def open_home_page(self):
+        self.wd.get(self.home_page_url)
+
+
+
+@pytest.fixture()
+def app(request):
+    fixture = Application()
+
+    def end():
+        fixture.quit()
+
+    request.addfinalizer(end)
+    return fixture
+
+
+#app = Application()
+
+
+def test_open_home_page(app):
+    app.home_page.open_page()
+    app.home_page.login(login=Vadim.mail, password=Vadim.password)
     time.sleep(timeout)
-    login_name = wd.find_element_by_css_selector(HomePageLocators.login_name_text).text
-    assert str(login_name).strip(" ") == Vadim.displayed_username
-    user_menu = wd.find_element_by_css_selector(HomePageLocators.users_menu)
-    user_menu.click()
-    button_users_menu_quit = wd.find_element_by_css_selector(HomePageLocators.users_menu_quit_buttton)
-    button_users_menu_quit.click()
+    assert app.home_page.check_user_session(Vadim.displayed_username)
+    app.home_page.logout()
     time.sleep(timeout)
     app.wd.quit()
